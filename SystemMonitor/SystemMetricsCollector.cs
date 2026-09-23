@@ -28,11 +28,11 @@ public static class SystemMetricsCollector
             NetworkType = networkType,
             WifiSsid = GetWifiSsid(),
             CpuUsagePercent = GetSystemCpuUsage(),
-            CpuTemperature = GetCpuTemperatureLibre(),
+            //CpuTemperature = GetCpuTemperatureLibre(),
             GpuName = gpuName,
             GpuUsagePercent = GetGpuUsagePercent(),
             GpuMemory = gpuMemory,
-            AvailableRamMb = GetAvailableMemoryMB(),
+            AvailableMemory = GetAvailableMemoryGB(),
             LogicalDisks = GetAllDisksUsage(),
             PhysicalDisks = GetPhysicalDisksTotalSize(),
             DatabaseCount = dbCount,
@@ -140,64 +140,68 @@ public static class SystemMetricsCollector
         return 0.0f;
     }
 
-    private static float GetCpuTemperatureLibre()
-    {
-        try
-        {
-            var computer = new Computer
-            {
-                IsCpuEnabled = true
-            };
+    //private static float GetCpuTemperatureLibre()
+    //{
+    //    try
+    //    {
+    //        var computer = new Computer
+    //        {
+    //            IsCpuEnabled = true
+    //        };
 
-            computer.Open();
+    //        computer.Open();
 
-            foreach (IHardware hardware in computer.Hardware)
-            {
-                if (hardware.HardwareType == HardwareType.Cpu)
-                {
-                    hardware.Update();
+    //        foreach (IHardware hardware in computer.Hardware)
+    //        {
+    //            if (hardware.HardwareType == HardwareType.Cpu)
+    //            {
+    //                hardware.Update();
 
-                    foreach (ISensor sensor in hardware.Sensors)
-                    {
-                        if (sensor.SensorType == SensorType.Temperature && sensor.Value.HasValue)
-                        {
-                            if (sensor.Name.Equals("CPU Package", StringComparison.OrdinalIgnoreCase) ||
-                                sensor.Name.Equals("Core Average", StringComparison.OrdinalIgnoreCase) ||
-                                sensor.Name.Equals("Core Max", StringComparison.OrdinalIgnoreCase))
-                            {
-                                float temp = sensor.Value.Value;
-                                computer.Close();
-                                return temp;
-                            }
-                        }
-                    }
-                }
-            }
+    //                foreach (ISensor sensor in hardware.Sensors)
+    //                {
+    //                    if (sensor.SensorType == SensorType.Temperature && sensor.Value.HasValue)
+    //                    {
+    //                        if (sensor.Name.Equals("CPU Package", StringComparison.OrdinalIgnoreCase) ||
+    //                            sensor.Name.Equals("Core Average", StringComparison.OrdinalIgnoreCase) ||
+    //                            sensor.Name.Equals("Core Max", StringComparison.OrdinalIgnoreCase))
+    //                        {
+    //                            float temp = sensor.Value.Value;
+    //                            computer.Close();
+    //                            return temp;
+    //                        }
+    //                    }
+    //                }
+    //            }
+    //        }
 
-            computer.Close();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[CPU Temp Error]: {ex.Message}");
-        }
+    //        computer.Close();
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        Console.WriteLine($"[CPU Temp Error]: {ex.Message}");
+    //    }
 
-        return 0.0f;
-    }
+    //    return 0.0f;
+    //}
 
-    private static long GetAvailableMemoryMB()
+    private static double GetAvailableMemoryGB()
     {
         if (!OperatingSystem.IsWindows()) return 0;
-        try
+
+        using var searcher = new ManagementObjectSearcher(
+                 "SELECT TotalVisibleMemorySize, FreePhysicalMemory FROM Win32_OperatingSystem");
+
+        using var collection = searcher.Get();
+        double totalGB;
+        foreach (ManagementObject obj in collection)
         {
-            using var searcher = new ManagementObjectSearcher("SELECT FreePhysicalMemory FROM Win32_OperatingSystem");
-            foreach (var obj in searcher.Get())
-            {
-                // FreePhysicalMemory is in KB
-                return Convert.ToInt64(obj["FreePhysicalMemory"]) / 1024;
-            }
+
+            double totalKB = Convert.ToDouble(obj["TotalVisibleMemorySize"]);
+            totalGB = totalKB / (1024.0 * 1024.0);
+            return Math.Ceiling(totalGB);
+            
         }
-        catch { }
-        return 0;
+        return 0.0;
     }
 
     private static List<string> GetAllDisksUsage()

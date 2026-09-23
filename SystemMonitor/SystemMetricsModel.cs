@@ -9,8 +9,8 @@ public class SystemMetricsModel
     public string NetworkType { get; set; } = string.Empty;
     public string WifiSsid { get; set; } = string.Empty;
     public float CpuUsagePercent { get; set; }
-    public float CpuTemperature { get; set; }
-    public long AvailableRamMb { get; set; }
+    //public float CpuTemperature { get; set; }
+    public double AvailableMemory { get; set; }
     public List<string> LogicalDisks { get; set; } = new();
     public List<string> PhysicalDisks { get; set; } = new();
     public string GpuName { get; set; } = string.Empty;
