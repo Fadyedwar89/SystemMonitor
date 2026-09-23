@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+	  <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-SystemMonitor-6a4a6a2a-988c-42f2-a426-e6e746324937</UserSecretsId>
+  </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="LibreHardwareMonitorLib" Version="0.9.6" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="7.1.0" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+		<PackageReference Include="System.Diagnostics.PerformanceCounter" Version="8.0.1" />
+		<PackageReference Include="System.Management" Version="10.0.2" />
+		<PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.1" />
+	</ItemGroup>
+</Project>
